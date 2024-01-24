@@ -89,6 +89,9 @@ def play_round(player_deck, opponent_deck, win_pile, deck, round_num):
             print("Opponent wins this round! Discarding your card.")
             player_deck.pop(player_choice)
 
+    # Print each player's winning pile after the round
+    print_player_win_pile(win_pile)
+
 def check_winning_conditions(win_pile):
     rock_colors = set()
     paper_colors = set()
@@ -102,7 +105,7 @@ def check_winning_conditions(win_pile):
         elif card.type == "Scissors":
             scissors_colors.add(card.color)
 
-    # Check if a player has won based on the updated winning conditions
+    # Check if a player has won based on the specified winning conditions
     if (len(rock_colors) >= 1 and len(paper_colors) >= 1 and len(scissors_colors) >= 1) or \
        (len(rock_colors) >= 3 or len(paper_colors) >= 3 or len(scissors_colors) >= 3):
         return True
@@ -114,6 +117,11 @@ def print_winner_win_pile(winner_win_pile):
     for card in winner_win_pile:
         print(f"{card.type} - {card.number} - {card.color}")
 
+def print_player_win_pile(player_win_pile):
+    print("\nPlayer's Win Pile:")
+    for card in player_win_pile:
+        print(f"{card.type} - {card.number} - {card.color}")
+
 def main():
     deck = create_deck()
 
@@ -121,35 +129,47 @@ def main():
     player1_deck = draw_initial_cards(deck, 5)
     player2_deck = draw_initial_cards(deck, 5)
 
-    # Print initial deck list for both players
-    print_deck_list(player1_deck, 1)
-    print_deck_list(player2_deck, 2)
-
-    win_pile = []
+    win_pile_player1 = []
+    win_pile_player2 = []
 
     round_num = 1
+    player1_score = 0
+    player2_score = 0
 
-    while not check_winning_conditions(win_pile):
-        print(f"\nPlayer 1's Turn (Round {round_num}):")
-        play_round(player1_deck, player2_deck, win_pile, deck, round_num)
+    while not check_winning_conditions(win_pile_player1) and not check_winning_conditions(win_pile_player2):
+        print(f"\nRound {round_num} - Your Turn (Player 1):")
+        play_round(player1_deck, player2_deck, win_pile_player1, deck, round_num)
 
-        if check_winning_conditions(win_pile):
+        if check_winning_conditions(win_pile_player1):
             break
 
-        print(f"\nPlayer 2's Turn (Round {round_num}):")
-        play_round(player2_deck, player1_deck, win_pile, deck, round_num)
+        print(f"\nRound {round_num} - Opponent's Turn (Player 2):")
+        play_round(player2_deck, player1_deck, win_pile_player2, deck, round_num)
 
         round_num += 1
+
+        # Update scores
+        player1_score = len([card for card in win_pile_player1 if card.color == "Red" or card.color == "Blue" or card.color == "Yellow"])
+        player2_score = len([card for card in win_pile_player2 if card.color == "Green" or card.color == "Orange"])
+
+        # Print scores
+        print(f"\nScores after Round {round_num - 1}:")
+        print(f"Player 1 Score: {player1_score}")
+        print(f"Player 2 Score: {player2_score}")
+
+        # Print each player's winning pile
+        print_player_win_pile(win_pile_player1)
+        print_player_win_pile(win_pile_player2)
 
     print("\nGame Over! A player has met the winning conditions.")
     
     # Determine the winner (you can modify this based on your winning conditions)
-    winner = "Player 1" if check_winning_conditions(win_pile[:3]) else "Player 2"
-    
-    if winner == "Player 1":
-        print_winner_win_pile(win_pile[:3])
+    if check_winning_conditions(win_pile_player1):
+        print(f"\nPlayer 1 is the winner!")
+        print_winner_win_pile(win_pile_player1)
     else:
-        print_winner_win_pile(win_pile[3:])
+        print(f"\nPlayer 2 is the winner!")
+        print_winner_win_pile(win_pile_player2)
 
 if __name__ == "__main__":
     main()
